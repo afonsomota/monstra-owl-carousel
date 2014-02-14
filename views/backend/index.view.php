@@ -11,10 +11,17 @@
 
 <table class="table table-bordered">
     <thead>
-        <th><?php echo __('Items','owlcarousel') ?></th>
+        <th><?php echo __('Group','owlcarousel') ?></th>
+        <th><?php echo __('Order','owlcarousel') ?></th>
         <th></th>
     </thead>
     <tbody>
-        
+        <?php foreach ($item_hash as $group => $item){ ?>
+            <tr>
+                <td><?= $group ?></td>
+                <td><?= $item ?></td>
+                <td>EDIT</td>
+            </tr>
+        <? } ?>
     </tbody>
 </table>
