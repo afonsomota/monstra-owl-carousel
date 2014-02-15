@@ -1,13 +1,13 @@
 <?php
 
-Navigation::add(__('Owl Carousel','owlcarousel'),'content','owlcarousel',15);
+Navigation::add(__('Owl Carousel','owlcarousel'),'content','owlcarousel',4);
 
 
 class OwlCarouselAdmin extends Backend
 {
-    public function main()
+    public static function main()
     {
-        $owlcarousel_path = STORAGE . DS . 'owlcarousel' . DS
+        $owlcarousel_path = STORAGE . DS . 'owlcarousel' . DS;
         $items_list = array();
         $errors = array();
 
@@ -15,12 +15,12 @@ class OwlCarouselAdmin extends Backend
             switch(Request::get('action')){
                 case "add_item":
                     
-                    if(Request::post('add_item') || || Request::post('add_item_and_exit')){
+                    if(Request::post('add_item') ||  Request::post('add_item_and_exit')){
                         if(Security::check(Request::post('csrf'))){
                             if(trim(Request::post('order')) == '') 
                                 $errors['item_empty_order'] = __('Required field', 'owlcarousel');
                             
-                            $group = (trim(Request::post('group')) == ''?'default':Security::safeName(trim(Request::post('group')));
+                            $group = (trim(Request::post('group')) == ''?'default':Security::safeName(trim(Request::post('group'))));
                             $order = Security::safeName(trim(Request::post('order')));
                             $item_path = $owlcarousel_path.$group.DS.$order.'.owlitem.html';
 
@@ -28,7 +28,7 @@ class OwlCarouselAdmin extends Backend
                                 $errors['item_exists'] = __('This item exists', 'owlcarousel');
                             
                             if (count($errors) == 0){
-                                File::setContent($item_path,XML::safe(Request::post('editor')))
+                                File::setContent($item_path,XML::safe(Request::post('editor')));
                                 Notification::set('success', __('The item has been added.', 'owlcarousel'));
                                 if (Request::post('add_item_and_exit')){
                                     Request::redirect('index.php?id=owlcarousel');
@@ -59,10 +59,10 @@ class OwlCarouselAdmin extends Backend
                             if(trim(Request::post('order')) == '')
                                 $errors['item_empty_order'] = __('Required field', 'owlcarousel');
 
-                            $new_order = Security::safeName(trim(Request::post('order')))
-                            $old_order = Security::safeName(trim(Request::post('old_item_order')))
-                            $new_group = (trim(Request::post('group')) == ''?'default':Security::safeName(trim(Request::post('group')));
-                            $old_group = (trim(Request::post('old_item_group')) == ''?'default':Security::safeName(trim(Request::post('old_item_group')));
+                            $new_order = Security::safeName(trim(Request::post('order')));
+                            $old_order = Security::safeName(trim(Request::post('old_item_order')));
+                            $new_group = (trim(Request::post('group')) == ''?'default':Security::safeName(trim(Request::post('group'))));
+                            $old_group = (trim(Request::post('old_item_group')) == ''?'default':Security::safeName(trim(Request::post('old_item_group'))));
                             $new_item_path = $owlcarousel_path.$new_group.DS.$new_order.'.owlitem.html';
                             $old_item_path = $owlcarousel_path.$old_group.DS.$old_order.'.owlitem.html';
 
@@ -78,7 +78,7 @@ class OwlCarouselAdmin extends Backend
                                 if (Request::post('edit_item_and_exit')){
                                     Request::redirect('index.php?id=owlcarousel');
                                 }else{
-                                    Request::redirect('index.php?id=owlcarousel&action=edit_item&group='.$group.'&order='.$order;
+                                    Request::redirect('index.php?id=owlcarousel&action=edit_item&group='.$group.'&order='.$order);
                                 }
                             }
                         }else{
@@ -98,7 +98,7 @@ class OwlCarouselAdmin extends Backend
                 break;
                 case "delete_item":
                     if (Security::check(Request::get('token'))) {
-                        $group = (trim(Request::post('group')) == ''?'default':Security::safeName(trim(Request::post('group')));
+                        $group = (trim(Request::post('group')) == ''?'default':Security::safeName(trim(Request::post('group'))));
                         $order = Security::safeName(trim(Request::post('order')));
                         $item_path = $owlcarousel_path.$group.DS.$order.'.owlitem.html';
                         File::delete($item_path);
@@ -115,7 +115,7 @@ class OwlCarouselAdmin extends Backend
             foreach($group_list as $group){
                 $item_hash[$group] = File::scan($owlcarousel_path.DS.$group,'.owlitem.html');
             }
-            unset($group)
+            unset($group);
             View::factory('owlcarousel/views/backend/index')
                 ->assign('group_list',$group_list)
                 ->assign('item_hash',$item_hash)
