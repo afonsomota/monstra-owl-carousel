@@ -10,6 +10,11 @@ Plugin::register(__FILE__,
     'https://github.com/afonsomota',
     'owlcarousel');
 
+if (Session::exists('user_role') && in_array(Session::get('user_role'), array('admin', 'editor'))) {
+    Plugin::admin('owlcarousel');
+}
+
+
 //Add JS
 Javascript::add('plugins/owlcarousel/assets/js/owl.carousel.js');
 
