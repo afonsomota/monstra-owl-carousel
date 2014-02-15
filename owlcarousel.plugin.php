@@ -34,6 +34,11 @@ class OwlCarousel
     {
         
     }
+
+    public static function _renderScript()
+    {
+        
+    }
 }
 
 ?>
