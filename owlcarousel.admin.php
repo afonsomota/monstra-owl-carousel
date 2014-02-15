@@ -17,11 +17,8 @@ class OwlCarouselAdmin extends Backend
                     
                     if(Request::post('add_item') ||  Request::post('add_item_and_exit')){
                         if(Security::check(Request::post('csrf'))){
-                            if(trim(Request::post('order')) == '') 
-                                $errors['item_empty_order'] = __('Required field', 'owlcarousel');
-                            
                             $group = (trim(Request::post('group')) == ''?'default':Security::safeName(trim(Request::post('group'))));
-                            $order = Security::safeName(trim(Request::post('order')));
+                            $order = (trim(Request::post('order')) == ''?'0':Security::safeName(trim(Request::post('order'))));
                             $item_path = $owlcarousel_path.$group.DS.$order.'.owlitem.html';
 
                             if(file_exists($item_path)) 
@@ -54,17 +51,19 @@ class OwlCarouselAdmin extends Backend
                 break;
 
                 case "edit_item":
+                    $new_order = (trim(Request::post('order')) == ''?'0':Security::safeName(trim(Request::post('order'))));
+                    $old_order = (trim(Request::post('old_item_order')) == ''?'0':Security::safeName(trim(Request::post('old_item_order'))));
+                    $new_group = (trim(Request::post('group')) == ''?'default':Security::safeName(trim(Request::post('group'))));
+                    $old_group = (trim(Request::post('old_item_group')) == ''?'default':Security::safeName(trim(Request::post('old_item_group'))));
+                    $new_item_path = $owlcarousel_path.$new_group.DS.$new_order.'.owlitem.html';
+                    $old_item_path = $owlcarousel_path.$old_group.DS.$old_order.'.owlitem.html';
+                    
                     if (Request::post('edit_item') || Request::post('edit_item_and_exit') ){
                         if (Security::check(Request::post('csrf'))) {
                             if(trim(Request::post('order')) == '')
                                 $errors['item_empty_order'] = __('Required field', 'owlcarousel');
 
-                            $new_order = Security::safeName(trim(Request::post('order')));
-                            $old_order = Security::safeName(trim(Request::post('old_item_order')));
-                            $new_group = (trim(Request::post('group')) == ''?'default':Security::safeName(trim(Request::post('group'))));
-                            $old_group = (trim(Request::post('old_item_group')) == ''?'default':Security::safeName(trim(Request::post('old_item_group'))));
-                            $new_item_path = $owlcarousel_path.$new_group.DS.$new_order.'.owlitem.html';
-                            $old_item_path = $owlcarousel_path.$old_group.DS.$old_order.'.owlitem.html';
+                            
 
                             if(file_exists($new_item_path) and $new_item_path !== $old_item_path)
                                 $errors['item_exists'] = __('This item exists', 'owlcarousel');
@@ -98,8 +97,8 @@ class OwlCarouselAdmin extends Backend
                 break;
                 case "delete_item":
                     if (Security::check(Request::get('token'))) {
-                        $group = (trim(Request::post('group')) == ''?'default':Security::safeName(trim(Request::post('group'))));
-                        $order = Security::safeName(trim(Request::post('order')));
+                        $group = (trim(Request::get('group')) == ''?'default':Security::safeName(trim(Request::get('group'))));
+                        $order = Security::safeName(trim(Request::get('order')));
                         $item_path = $owlcarousel_path.$group.DS.$order.'.owlitem.html';
                         File::delete($item_path);
                         Notification::set('success',__('The item has been removed.', 'owlcarousel'));
@@ -110,10 +109,16 @@ class OwlCarouselAdmin extends Backend
                 break;
             }
         }else{
-            $group_list = File::scan($owlcarousel_path);
+            $group_list = array();
+            $dir = opendir($owlcarousel_path);
+            
+            while(false !== ($d = readdir($dir))){
+                if($d != '.' and $d != '..' and is_dir($owlcarousel_path.$d)) $group_list[] = $d;
+            }
             $item_hash = array();
             foreach($group_list as $group){
-                $item_hash[$group] = File::scan($owlcarousel_path.DS.$group,'.owlitem.html');
+                $files = File::scan($owlcarousel_path.$group,'.owlitem.html');
+                $item_hash[$group] = array_map("str_replace",array_fill(0,count($files),'.owlitem.html'),array_fill(0,count($files),''),$files);
             }
             unset($group);
             View::factory('owlcarousel/views/backend/index')

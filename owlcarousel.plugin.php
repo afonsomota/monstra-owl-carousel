@@ -14,6 +14,9 @@ if (Session::exists('user_role') && in_array(Session::get('user_role'), array('a
     Plugin::admin('owlcarousel');
 }
 
+//Add Shortcodes
+
+
 
 //Add JS
 Javascript::add('plugins/owlcarousel/assets/js/owl.carousel.js');
